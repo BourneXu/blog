@@ -8,8 +8,8 @@ const Item = ({ name, path, active }) => {
 }
 
 export default ({ url }) => <div className='navigation'>
-  <Item name='Posts' path='/posts' active={url === '/blog'}/>
-  <Item name='Home' path='/' active={url === '/'}/>
+  <Item name='Posts' path='/posts' active={url === '/blog'} />
+  <Item name='About' path='/' active={url === '/'} />
   <style jsx>{`
     .navigation {
       display: flex;
