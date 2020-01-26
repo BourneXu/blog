@@ -1,10 +1,8 @@
-import link from './link'
-
 const YEAR = (new Date).getFullYear()
 
 export default () => <footer>
-  <p><link.a href="/feed.xml">RSS feed</link.a></p>
-  <abbr title='This website and all its content are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.'>CC BY-NC-SA 4.0</abbr> © 2019
+  <p>Subscribe via <a href="#">RSS</a></p>
+  <abbr title='This website and all its content are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.'>CC BY-NC-SA 4.0</abbr> © 2019 - 2020 ❤️ Chao Xu
   <style jsx>{`
     footer {
       margin-bottom: 2rem;
