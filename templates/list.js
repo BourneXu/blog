@@ -7,18 +7,18 @@ export default meta => ({ children }) => <MDXProvider components={{
   ...theme.components,
   ...theme.TemplateList,
 }}><>
-  <Head>
-    <title>{meta.title}</title>
-  </Head>
-  <theme.Container>
-    <theme.components.h1>{meta.title}</theme.components.h1>
-    <theme.Nav url={meta.url}/>
-    <theme.Content>{children}</theme.Content>
-    <theme.Footer/>
-    <style jsx>{`
+    <Head>
+      <title>Chao's Blog | {meta.title}</title>
+    </Head>
+    <theme.Container>
+      <theme.components.h1>{meta.title}</theme.components.h1>
+      <theme.Nav url={meta.url} />
+      <theme.Content>{children}</theme.Content>
+      <theme.Footer />
+      <style jsx>{`
       :global(small) {
         color: #999;
       }
     `}</style>
-  </theme.Container>
-</></MDXProvider>
+    </theme.Container>
+  </></MDXProvider>

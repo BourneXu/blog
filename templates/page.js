@@ -5,12 +5,12 @@ import theme from '../theme'
 
 export default meta => ({ children }) => <MDXProvider components={theme.components}><>
   <Head>
-    <title>{meta.title}</title>
+    <title>Chao's Blog | {meta.title}</title>
   </Head>
   <theme.Container>
     <theme.components.h1>{meta.title}</theme.components.h1>
-    <theme.Nav url={meta.url}/>
+    <theme.Nav url={meta.url} />
     <theme.Content>{children}</theme.Content>
-    <theme.Footer/>
+    <theme.Footer />
   </theme.Container>
 </></MDXProvider>
