@@ -17,32 +17,32 @@ export default post(meta)
 首先是卸载 `nvidia-driver`和 `cuda` . 我直接 `rm -rf /usr/local/cuda-10.1` ，这种直接 remove 会造成大量的包依赖问题，严重导致 `apt-get`无法正常update or upgrade．当遇到这种情况时，你即使用 `sudo apt --fix-broken install` 也无济于事，需要使用下面命令来解除包依赖关系并且安全删除:
 
 可以先尝试一下
-
+``` bash
     sudo apt purge navidia-*
     sudo apt-get remove nvidia*
     sudo apt-get autoremove --purge cuda
     sudo apt-get --purge remove cuda*
     sudo dpkg --remove --force-all cuda*
     sudo dpkg --audit
-
+```
 以上命令执行后仍然无法进行 apt update 和 apt upgrade 时．可以使用 **[aptsources-cleanup](https://github.com/davidfoerster/aptsources-cleanup)**. 下载其.zip 包后执行
-
+``` bash
     sudo apt install python3-apt python3-regex
     sudo python3 -OEs aptsources-cleanup.zip
     sudo apt-get update
-
+```
 至此，应该将原有的nvidia驱动和cuda都已经移除，接下来就是装新的nvidia驱动和cuda的时候了．
 
 先装nvidia驱动解决我的屏幕分辨率的问题
-
+``` bash
     apt search nvidia-driver
     nvidia-smi
     sudo apt install nvidia-driver-440
     sudo ubuntu-drivers devices
     sudo ubuntu-drivers autoinstall
-
+```
 接着安装 `cuda-10.2` ，我的机器是 `ubuntu 18.04`. 这部分我是按照[官方安装步骤](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)来的，应该不会出什么问题．  
-
+``` bash
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
     sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
     sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
@@ -50,15 +50,15 @@ export default post(meta)
     sudo apt-get update
     sudo apt-get -y install cuda
     export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}
-
+```
 安装完成后检查
-
+``` bash
     cat /proc/driver/nvidia/version
     nvcc --version
     nvidia-smi
-
+```
 安装cudnn, tensorRT
-
+``` bash
     sudo apt-get install libboost-all-dev
     sudo apt-get install -y --no-install-recommends libnvinfer-dev=7.0.0-1+cuda10.2
     ## go to download cudnn-10.2-linux-x64-v7.6.5.32.tgz
@@ -78,13 +78,13 @@ export default post(meta)
     sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
     sudo apt-get install libnvinfer-dev libnvonnxparsers-dev\n libnvparsers-dev libnvinfer-plugin-dev
     sudo apt-get install python-libnvinfer python3-libnvinfer
-
+```
 这样初步的重装步骤就完成了，我在最开始的包的依赖删除那边坑了许久．
 
 在 Tensorflow 官网上也提供了CUDA的安装步骤 ，[点这里](https://www.tensorflow.org/install/gpu#ubuntu_1804_cuda_101)．
 
 问题又来了在我安装完这些 cudnn，TensorRT之后发现，当我 `import tensorflow` 时，会出现有lib找不到的问题．对于有些warning，如 `libcudnn`，我是通过重新link解决的，但是并不适用于所有的情况．
-
+``` bash
     cd /usr/local/cuda/lib64/
     ls -lha libcudnn*
     sudo rm libcudnn.so
@@ -92,23 +92,23 @@ export default post(meta)
     sudo ln libcudnn.so.7.6.5 libcudnn.so.7
     sudo ln libcudnn.so.7 libcudnn.so
     sudo ldconfig
-
+```
 在我尝试了重新link之后，依然还会有这些warning出现，并且显示我的TF无法支持GPU．检查发现确实坚持不到我的GPU．
-
+``` bash
     W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.6: cannot open shared object file: No such file or directory
     W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.6: cannot open shared object file: No such file or directory
     W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
-
+```
 检查是否有GPU可以使用．
-
+``` python3
     from __future__ import absolute_import, division, print_function, unicode_literals
     import tensorflow as tf
     print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-
+```
 好了，还差最后一步，怎么就检测不到呢？搜了一下好像也没有看到有靠谱的解决方案，于是尝试用 `conda` 重装 `tensorflow` 和 `tensorflow-gpu`．在自动检查环境时确实发现了很多问题并且提供了一键式的安装解决，(我之前都是 `pip` 安装的所有包)．**注意,** 一定要 install 一下 tensorflow-gpu，不然虽然解决了所有warning问题但是还是找不到GPU．具体原因我没有细究了．
-
+``` bash
     conda install -y tensorflow
     conda install -y tensorflow-gpu
-
+```
 
 

@@ -1,8 +1,8 @@
 import { MDXProvider } from '@mdx-js/tag'
 import { withRouter } from 'next/router'
-
-import Head from './helpers/head'
 import theme from '../theme'
+import Head from './helpers/head'
+
 
 export default meta => withRouter(({ children, router }) => {
   const rootPath = router.pathname.split('/').slice(0, -1).join('/')
